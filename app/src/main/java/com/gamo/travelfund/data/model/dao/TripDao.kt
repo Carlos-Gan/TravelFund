@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import com.gamo.travelfund.data.model.entity.TripEntity
-import com.gamo.travelfund.ui.components.TripWithStats
+import com.gamo.travelfund.data.stats.TripWithStats
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -26,7 +26,8 @@ interface TripDao {
     @Delete
     suspend fun deleteTrip(trip: TripEntity)
 
-    @Query("""
+    @Query(
+        """
     SELECT 
         t.*,
         COALESCE(
@@ -44,6 +45,25 @@ interface TripDao {
         ) AS savedAmount
     FROM trips t
     ORDER BY t.id DESC
-""")
+"""
+    )
     fun getTripsWithStats(): Flow<List<TripWithStats>>
+
+    @Query("SELECT * FROM trips")
+    suspend fun getTripsOnce(): List<TripEntity>
+
+    @Query(
+        """
+    UPDATE trips 
+    SET exchangeRate = :exchangeRate,
+        lastExchangeUpdate = :updatedAt,
+        convertedBudget = totalBudget * :exchangeRate
+    WHERE id = :tripId
+"""
+    )
+    suspend fun updateExchangeRate(
+        tripId: Long,
+        exchangeRate: Double,
+        updatedAt: Long = System.currentTimeMillis()
+    )
 }

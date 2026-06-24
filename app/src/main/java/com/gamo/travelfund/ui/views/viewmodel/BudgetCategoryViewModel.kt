@@ -9,6 +9,8 @@ import kotlinx.coroutines.launch
 class BudgetCategoryViewModel(
     private val repository: BudgetCategoryRepository
 ) : ViewModel() {
+
+
     fun getCategoriesForTrip(tripId: Long) =
         repository.getCategoriesForTrip(tripId)
 
@@ -29,4 +31,7 @@ class BudgetCategoryViewModel(
             repository.deleteCategory(category)
         }
     }
+
+    fun getCategoriesWithStats(tripId: Long) =
+        repository.getCategoriesWithStats(tripId)
 }

@@ -1,5 +1,6 @@
 package com.gamo.travelfund.ui.navigation
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
@@ -9,29 +10,41 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.gamo.travelfund.TravelFundApp
 import com.gamo.travelfund.data.model.entity.BudgetCategoryEntity
+import com.gamo.travelfund.data.model.entity.MovementType
 import com.gamo.travelfund.data.model.entity.SavingMovementEntity
+import com.gamo.travelfund.data.preferences.NotificationSettings
+import com.gamo.travelfund.data.preferences.SettingsPreferences
 import com.gamo.travelfund.data.repository.BudgetCategoryRepository
 import com.gamo.travelfund.data.repository.CurrencyRepository
 import com.gamo.travelfund.data.repository.SavingMovementRepository
 import com.gamo.travelfund.data.repository.TripRepository
+import com.gamo.travelfund.services.NotificationHelper
 import com.gamo.travelfund.ui.views.modelFactory.BudgetCategoryViewModelFactory
 import com.gamo.travelfund.ui.views.modelFactory.CurrencyViewModelFactory
 import com.gamo.travelfund.ui.views.modelFactory.SavingMovementViewModelFactory
+import com.gamo.travelfund.ui.views.modelFactory.SettingsViewModelFactory
 import com.gamo.travelfund.ui.views.modelFactory.TripViewModelFactory
 import com.gamo.travelfund.ui.views.screens.AddTripScreen
 import com.gamo.travelfund.ui.views.screens.HomeScreen
-import com.gamo.travelfund.ui.views.screens.TripDetailScreen
+import com.gamo.travelfund.ui.views.screens.SettingsScreen
+import com.gamo.travelfund.ui.views.screens.tripDetail.TripDetailScreen
 import com.gamo.travelfund.ui.views.viewmodel.BudgetCategoryViewModel
 import com.gamo.travelfund.ui.views.viewmodel.CurrencyViewModel
 import com.gamo.travelfund.ui.views.viewmodel.SavingMovementViewModel
+import com.gamo.travelfund.ui.views.viewmodel.SettingsViewModel
 import com.gamo.travelfund.ui.views.viewmodel.TripViewModel
+import com.gamo.travelfund.utils.getSavingMilestone
+import kotlinx.coroutines.flow.flowOf
 import kotlin.collections.emptyList
 
+@SuppressLint("MissingPermission")
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
@@ -70,6 +83,16 @@ fun AppNavigation() {
         factory = BudgetCategoryViewModelFactory(budgetCategoryRepository)
     )
 
+    val settingsPreferences = SettingsPreferences(context)
+
+    val settingsViewModel: SettingsViewModel = viewModel(
+        factory = SettingsViewModelFactory(settingsPreferences)
+    )
+
+    val settings by settingsViewModel.settings.collectAsState(
+        initial = NotificationSettings()
+    )
+
     NavHost(
         navController = navController,
         startDestination = Screen.Home.route,
@@ -79,6 +102,8 @@ fun AppNavigation() {
         popExitTransition = { ExitTransition.None },
         exitTransition = { ExitTransition.None }
     ) {
+
+        //Home Screen
         composable(Screen.Home.route) {
             HomeScreen(
                 trips = tripsWithStats,
@@ -87,20 +112,32 @@ fun AppNavigation() {
                 },
                 onTripClick = { trip ->
                     navController.navigate(Screen.TripDetail.createRoute(trip.id))
+                },
+                onDeleteTrip = { trip ->
+                    tripViewModel.deleteTrip(trip)
+                },
+                onEditTrip = { trip ->
+                    navController.navigate(Screen.EditTrip.createRoute(trip.id))
+                },
+                onSettingsClick = {
+                    navController.navigate(Screen.Settings.route)
                 }
             )
         }
+        //Add Trip
         composable(Screen.AddTrip.route) {
             AddTripScreen(
                 onBack = {
                     navController.popBackStack()
                 },
-                onSaveTrip = { trip ->
+                onSubmitTrip = { trip ->
                     tripViewModel.insertTrip(trip)
                     navController.popBackStack()
                 }
             )
         }
+
+        //Trip Detail
         composable(Screen.TripDetail.route) { backStackEntry ->
 
             val tripId = backStackEntry.arguments
@@ -126,15 +163,15 @@ fun AppNavigation() {
                 if (tripId != null) {
                     savingViewModel.getMovementsByTrip(tripId)
                 } else {
-                    kotlinx.coroutines.flow.flowOf<List<SavingMovementEntity>>(emptyList())
+                    flowOf<List<SavingMovementEntity>>(emptyList())
                 }
             }.collectAsState(initial = emptyList())
 
             val categories by remember(tripId) {
                 if (tripId != null) {
-                    budgetCategoryViewModel.getCategoriesForTrip(tripId)
+                    budgetCategoryViewModel.getCategoriesWithStats(tripId)
                 } else {
-                    kotlinx.coroutines.flow.flowOf<List<BudgetCategoryEntity>>(emptyList())
+                    flowOf(emptyList())
                 }
             }.collectAsState(initial = emptyList())
 
@@ -147,11 +184,95 @@ fun AppNavigation() {
                     navController.popBackStack()
                 },
                 onSaveMovement = { movement ->
-                    savingViewModel.insertMovement(movement)
+                   val previousSaved = movements
+                       .filter{it.type == MovementType.INCOME}
+                       .sumOf { it.amount } -
+                           movements
+                               .filter{it.type == MovementType.EXPENSE}
+                               .sumOf { it.amount }
+                    val previousPercent = if ((trip?.totalBudget ?: 0.0)>0){
+                        ((previousSaved / trip!!.totalBudget) * 100).toInt()
+                    }else 0
+                    savingViewModel.insertMovement(
+                        movement = movement,
+                        onAfterInsert ={
+                            val currentSaved = savingViewModel.getRealSavedAmount(movement.tripId)
+
+                            val currentPercent = if ((trip?.totalBudget ?: 0.0) > 0) {
+                                ((currentSaved / trip!!.totalBudget) * 100).toInt()
+                            } else 0
+
+                            val milestone = getSavingMilestone(
+                                previousPercent = previousPercent,
+                                currentPercent = currentPercent
+                            )
+                            if (
+                                milestone != null &&
+                                settings.notificationsEnabled &&
+                                settings.notifySavingGoal
+                            ) {
+                                NotificationHelper.showNotification(
+                                    context = context,
+                                    title = "Meta de ahorro alcanzada",
+                                    message = "Has alcanzado el ${milestone}% de tu meta de ahorro"
+                                )
+                            }
+
+                        }
+                    )
                 },
                 onSaveCategory = { category ->
                     budgetCategoryViewModel.insertCategory(category)
+                },
+                onDeleteMovement = { movement ->
+                    savingViewModel.deleteMovement(movement)
+                },
+                onUpdateMovement = { movement ->
+                    savingViewModel.updateMovement(movement)
+                },
+                onUpdateCategory = { category ->
+                    budgetCategoryViewModel.updateCategory(category)
+                },
+                onDeleteCategory = { category ->
+                    budgetCategoryViewModel.deleteCategory(category)
                 }
+            )
+        }
+
+        //Edit Trip
+        composable(
+            Screen.EditTrip.route,
+            arguments = listOf(navArgument("tripId") { type = NavType.LongType })
+        ) { backStackEntry ->
+
+            val tripId = backStackEntry.arguments?.getLong("tripId")
+
+            val trip = tripsWithStats.find { it.trip.id == tripId }?.trip
+
+            AddTripScreen(
+                editingTrip = trip,
+                onBack = {
+                    navController.popBackStack()
+                },
+                onSubmitTrip = { updatedTrip ->
+                    tripViewModel.updateTrip(updatedTrip)
+                    navController.popBackStack()
+                }
+            )
+        }
+        //Settings
+        composable(Screen.Settings.route) {
+
+            SettingsScreen(
+                settings = settings,
+                onBack = {
+                    navController.popBackStack()
+                },
+                onNotificationsEnabledChange = settingsViewModel::setNotificationsEnabled,
+                onNotifyFewDaysChange = settingsViewModel::setNotifyFewDays,
+                onNotifySavingGoalChange = settingsViewModel::setNotifySavingGoal,
+                onNotifyNoSavingsChange = settingsViewModel::setNotifyNoSavings,
+                onNotifyExchangeRateChange = settingsViewModel::setNotifyExchangeRate
             )
         }
     }

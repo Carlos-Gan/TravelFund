@@ -22,4 +22,11 @@ class TripRepository(
         tripDao.deleteTrip(trip)
     }
 
+    suspend fun updateExchangeRate(
+        tripId: Long,
+        exchangeRate: Double
+    ) {
+        tripDao.updateExchangeRate(tripId, exchangeRate)
+    }
+
 }

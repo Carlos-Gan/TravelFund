@@ -1,4 +1,4 @@
-package com.gamo.travelfund.ui.components
+package com.gamo.travelfund.data.stats
 
 import androidx.room.Embedded
 import com.gamo.travelfund.data.model.entity.TripEntity

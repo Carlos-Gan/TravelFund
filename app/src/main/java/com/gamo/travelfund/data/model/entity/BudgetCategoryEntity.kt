@@ -24,7 +24,6 @@ data class BudgetCategoryEntity(
     val name: String,
     val emoji: String,
     val plannedAmount: Double,
-    val spentAmount: Double = 0.00,
     val isEssential: Boolean = false,
     val createdAt: String = ""
 )

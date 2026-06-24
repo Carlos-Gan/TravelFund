@@ -1,5 +1,6 @@
 package com.gamo.travelfund.ui.components
 
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,11 +23,16 @@ import androidx.compose.ui.unit.dp
 import com.gamo.travelfund.data.model.entity.BudgetCategoryEntity
 
 @Composable
-fun CategoryCard(category: BudgetCategoryEntity, baseCurrency: String) {
+fun CategoryCard(
+    category: BudgetCategoryEntity,
+    spentAmount: Double,
+    baseCurrency: String,
+    onLongClick: () -> Unit = {}
+    ) {
     val progress = if (category.plannedAmount > 0)
-        (category.spentAmount / category.plannedAmount).toFloat().coerceIn(0f, 1f)
+        (spentAmount / category.plannedAmount).toFloat().coerceIn(0f, 1f)
     else 0f
-    val remaining = category.plannedAmount - category.spentAmount
+    val remaining = category.plannedAmount - spentAmount
     val isOverBudget = remaining < 0
 
     Card(
@@ -38,7 +44,12 @@ fun CategoryCard(category: BudgetCategoryEntity, baseCurrency: String) {
             else MaterialTheme.colorScheme.outlineVariant
         ),
         elevation = CardDefaults.cardElevation(0.dp),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .combinedClickable(
+                onClick = {},
+                onLongClick = onLongClick
+            )
     ) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
 
@@ -111,7 +122,7 @@ fun CategoryCard(category: BudgetCategoryEntity, baseCurrency: String) {
 
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(
-                    text = "Gastado: $${formatAmount(category.spentAmount)}",
+                    text = "Gastado: $${formatAmount(spentAmount)}",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

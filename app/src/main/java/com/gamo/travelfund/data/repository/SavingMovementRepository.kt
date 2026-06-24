@@ -15,4 +15,8 @@ class SavingMovementRepository(
     }
 
     suspend fun deleteMovement(movement: SavingMovementEntity) = dao.delete(movement)
+
+    suspend fun updateMovement(movement: SavingMovementEntity) {
+        dao.update(movement)
+    }
 }

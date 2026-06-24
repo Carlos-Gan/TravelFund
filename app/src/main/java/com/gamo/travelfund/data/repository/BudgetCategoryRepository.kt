@@ -17,4 +17,7 @@ class BudgetCategoryRepository(
 
     suspend fun deleteCategory(category: BudgetCategoryEntity) =
         dao.deleteCategory(category)
+
+    fun getCategoriesWithStats(tripId: Long) =
+        dao.getCategoriesWithStats(tripId)
 }

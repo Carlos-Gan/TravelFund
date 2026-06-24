@@ -15,14 +15,24 @@ enum class MovementType {INCOME, EXPENSE}
             parentColumns = ["id"],
             childColumns = ["tripId"],
             onDelete = ForeignKey.CASCADE
+        ),
+        ForeignKey(
+            entity = BudgetCategoryEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["categoryId"],
+            onDelete = ForeignKey.SET_NULL
         )
     ],
-    indices = [Index("tripId")]
+    indices = [
+        Index("tripId"),
+        Index("categoryId")
+    ]
 )
 data class SavingMovementEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val tripId: Long,
+    val categoryId: Long? = null,
     val amount: Double,
     val type: MovementType,
     val note: String = "",

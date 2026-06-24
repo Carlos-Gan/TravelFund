@@ -19,7 +19,7 @@ import com.gamo.travelfund.data.model.entity.TripEntity
         ContributionEntity::class,
         SavingMovementEntity::class
     ],
-    version = 5,
+    version = 6,
     exportSchema = false
 )
 

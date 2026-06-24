@@ -4,22 +4,26 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import com.gamo.travelfund.data.model.entity.SavingMovementEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SavingMovementDao {
-    @Query("""
+    @Query(
+        """
         SELECT *
         FROM saving_movements
         WHERE tripId = :tripId
         ORDER BY dateMillis DESC
-    """)
+    """
+    )
     fun getMovementsForTrip(
         tripId: Long
     ): Flow<List<SavingMovementEntity>>
 
-    @Query("""
+    @Query(
+        """
     SELECT COALESCE(
         SUM(
             CASE 
@@ -31,7 +35,8 @@ interface SavingMovementDao {
     )
     FROM saving_movements
     WHERE tripId = :tripId
-""")
+"""
+    )
     suspend fun getRealSavedAmount(tripId: Long): Double
 
     @Insert
@@ -39,4 +44,19 @@ interface SavingMovementDao {
 
     @Delete
     suspend fun delete(movement: SavingMovementEntity)
+
+    @Update
+    suspend fun update(movement: SavingMovementEntity)
+
+    @Query(
+        """
+    SELECT *
+    FROM saving_movements
+    WHERE tripId = :tripId
+    AND type = 'INCOME'
+    ORDER BY dateMillis DESC
+    LIMIT 1
+"""
+    )
+    suspend fun getLastIncomeMovement(tripId: Long): SavingMovementEntity?
 }

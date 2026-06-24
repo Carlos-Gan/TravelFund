@@ -8,4 +8,9 @@ sealed class Screen(val route: String) {
             return "trip_detail/$tripId"
         }
     }
+    data object EditTrip : Screen("edit_trip/{tripId}"){
+        fun createRoute(tripId: Long) = "edit_trip/$tripId"
+    }
+
+    data object Settings: Screen("settings")
 }

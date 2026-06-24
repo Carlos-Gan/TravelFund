@@ -1,5 +1,6 @@
 package com.gamo.travelfund.ui.components
 
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -17,7 +18,8 @@ import java.time.format.DateTimeFormatter
 fun TripCard(
     trip: TripEntity,
     onClick: () -> Unit = {},
-    savedAmount: Double
+    onLongClick: () -> Unit = {},
+    savedAmount: Double,
 ) {
     val progress = if (trip.totalBudget > 0)
         (savedAmount / trip.totalBudget).toFloat().coerceIn(0f, 1f)
@@ -54,15 +56,17 @@ fun TripCard(
         }
     }
 
-    val displayFormatter = DateTimeFormatter.ofPattern("d MMM yyyy", java.util.Locale("es", "MX"))
-
     Card(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick
+            ),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,       // surface en lugar de surfaceVariant
-            contentColor = MaterialTheme.colorScheme.onSurface      // garantiza que todo el texto encima sea legible
+            contentColor = MaterialTheme.colorScheme.onSurface      // garantiza que el texto encima sea legible
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         border = androidx.compose.foundation.BorderStroke(

@@ -1,5 +1,6 @@
 package com.gamo.travelfund.ui.components
 
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,10 +19,18 @@ import com.gamo.travelfund.data.model.entity.MovementType
 import com.gamo.travelfund.data.model.entity.SavingMovementEntity
 
 @Composable
-fun MovementRow(movement: SavingMovementEntity) {
+fun MovementRow(
+    movement: SavingMovementEntity,
+    onLongClick: () -> Unit = {}
+) {
     val isIncome = movement.type == MovementType.INCOME
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .combinedClickable(
+                onClick = {},
+                onLongClick = onLongClick
+            ),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {

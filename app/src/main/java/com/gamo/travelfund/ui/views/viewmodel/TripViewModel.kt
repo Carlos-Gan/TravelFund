@@ -18,5 +18,17 @@ class TripViewModel(
         }
     }
 
+    fun deleteTrip(trip: TripEntity) {
+        viewModelScope.launch {
+            repository.deleteTrip(trip)
+        }
+    }
+
+    fun updateTrip(trip: TripEntity) {
+        viewModelScope.launch {
+            repository.updateTrip(trip)
+        }
+    }
+
 
 }

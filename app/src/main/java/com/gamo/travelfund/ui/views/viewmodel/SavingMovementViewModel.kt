@@ -7,21 +7,34 @@ import com.gamo.travelfund.data.repository.SavingMovementRepository
 import kotlinx.coroutines.launch
 
 class SavingMovementViewModel(
-    private val savingRepository: SavingMovementRepository
-
+    private val savingRepository: SavingMovementRepository,
 ) : ViewModel() {
-
     fun getMovementsByTrip(tripId: Long) =
         savingRepository.getMovementsForTrip(tripId)
 
-    fun insertMovement(movement: SavingMovementEntity) {
+    fun insertMovement(
+        movement: SavingMovementEntity,
+        onAfterInsert: suspend () -> Unit = {}
+    ) {
         viewModelScope.launch {
             savingRepository.insertMovement(movement)
-
-            val total = savingRepository.getRealSavedAmount(movement.tripId)
-
-            println("DEBUG tripId: ${movement.tripId}")
-            println("DEBUG total: $total")
+            onAfterInsert()
         }
+    }
+
+    fun deleteMovement(movement: SavingMovementEntity) {
+        viewModelScope.launch {
+            savingRepository.deleteMovement(movement)
+        }
+    }
+
+    fun updateMovement(movement: SavingMovementEntity) {
+        viewModelScope.launch {
+            savingRepository.updateMovement(movement)
+        }
+    }
+
+    suspend fun getRealSavedAmount(tripId: Long): Double {
+        return savingRepository.getRealSavedAmount(tripId)
     }
 }
