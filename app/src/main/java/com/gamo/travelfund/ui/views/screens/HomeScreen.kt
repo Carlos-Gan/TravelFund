@@ -183,9 +183,6 @@ fun HomeScreen(
                         )
                     }
                 }
-                IconButton(onClick = onSettingsClick) {
-                    Icon(Icons.Default.ClearAll, contentDescription = stringResource(R.string.configuracion))
-                }
             }
 
             // — Filtros —
