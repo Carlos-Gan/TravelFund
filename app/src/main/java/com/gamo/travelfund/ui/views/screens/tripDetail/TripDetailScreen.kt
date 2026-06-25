@@ -13,6 +13,7 @@ fun TripDetailScreen(
     categories: List<BudgetCategoryWithStats>,
     exchangeRate: Double,
     onBack: () -> Unit,
+    onAiClick: () -> Unit,
     onSaveMovement: (SavingMovementEntity) -> Unit,
     onUpdateMovement: (SavingMovementEntity) -> Unit,
     onDeleteMovement: (SavingMovementEntity) -> Unit,
@@ -33,5 +34,6 @@ fun TripDetailScreen(
         onUpdateCategory = onUpdateCategory,
         onDeleteCategory = onDeleteCategory,
         baseCurrency = trip?.baseCurrency ?: "",
+        onAiClick = onAiClick
     )
 }

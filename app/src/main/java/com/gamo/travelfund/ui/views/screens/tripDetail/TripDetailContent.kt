@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Assistant
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -33,7 +34,8 @@ fun TripDetailContent(
     onDeleteMovement: (SavingMovementEntity) -> Unit,
     onSaveCategory: (BudgetCategoryEntity) -> Unit,
     onUpdateCategory: (BudgetCategoryEntity) -> Unit,
-    onDeleteCategory: (BudgetCategoryEntity) -> Unit
+    onDeleteCategory: (BudgetCategoryEntity) -> Unit,
+    onAiClick: () -> Unit
 ) {
     var showMovementSheet by remember { mutableStateOf(false) }
     var showCategorySheet by remember { mutableStateOf(false) }
@@ -114,6 +116,11 @@ fun TripDetailContent(
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+                    }
+                },
+                actions = {
+                    IconButton(onClick = onAiClick) {
+                        Icon(Icons.Default.Assistant, null)
                     }
                 }
             )

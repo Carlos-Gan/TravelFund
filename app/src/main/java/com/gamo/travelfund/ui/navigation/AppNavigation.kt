@@ -5,7 +5,9 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Assistant
 import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.DesignServices
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
@@ -34,14 +36,17 @@ import com.gamo.travelfund.data.preferences.NotificationSettings
 import com.gamo.travelfund.data.preferences.SettingsPreferences
 import com.gamo.travelfund.data.repository.BudgetCategoryRepository
 import com.gamo.travelfund.data.repository.CurrencyRepository
+import com.gamo.travelfund.data.repository.GeminiRepository
 import com.gamo.travelfund.data.repository.SavingMovementRepository
 import com.gamo.travelfund.data.repository.TripRepository
 import com.gamo.travelfund.services.NotificationHelper
 import com.gamo.travelfund.ui.views.modelFactory.BudgetCategoryViewModelFactory
 import com.gamo.travelfund.ui.views.modelFactory.CurrencyViewModelFactory
+import com.gamo.travelfund.ui.views.modelFactory.GeminiViewModelFactory
 import com.gamo.travelfund.ui.views.modelFactory.SavingMovementViewModelFactory
 import com.gamo.travelfund.ui.views.modelFactory.SettingsViewModelFactory
 import com.gamo.travelfund.ui.views.modelFactory.TripViewModelFactory
+import com.gamo.travelfund.ui.views.screens.AIRecommendationsScreen
 import com.gamo.travelfund.ui.views.screens.AddTripScreen
 import com.gamo.travelfund.ui.views.screens.HomeScreen
 import com.gamo.travelfund.ui.views.screens.SettingsScreen
@@ -49,6 +54,7 @@ import com.gamo.travelfund.ui.views.screens.StatisticsScreen
 import com.gamo.travelfund.ui.views.screens.tripDetail.TripDetailScreen
 import com.gamo.travelfund.ui.views.viewmodel.BudgetCategoryViewModel
 import com.gamo.travelfund.ui.views.viewmodel.CurrencyViewModel
+import com.gamo.travelfund.ui.views.viewmodel.GeminiViewModel
 import com.gamo.travelfund.ui.views.viewmodel.SavingMovementViewModel
 import com.gamo.travelfund.ui.views.viewmodel.SettingsViewModel
 import com.gamo.travelfund.ui.views.viewmodel.TripViewModel
@@ -114,6 +120,12 @@ fun AppNavigation() {
         Screen.Settings.route
     )
 
+    val geminiRepository = GeminiRepository()
+
+    val geminiViewModel: GeminiViewModel = viewModel(
+        factory = GeminiViewModelFactory(geminiRepository)
+    )
+
     val showBottomBar = currentRoute in bottomBarRoutes
 
     Scaffold(
@@ -131,6 +143,19 @@ fun AppNavigation() {
                             }
                         },
                         icon = { Icon(Icons.Default.Home, contentDescription = null) }
+                    )
+
+                    NavigationBarItem(
+                        selected = currentRoute == Screen.AiRecomendations.route,
+                        onClick = {
+                            navController.navigate(Screen.AiRecomendations.route) {
+                                launchSingleTop = true
+                                popUpTo(Screen.AiRecomendations.route) {
+                                    inclusive = true
+                                }
+                            }
+                        },
+                        icon = {Icon(Icons.Default.Assistant, contentDescription = null)}
                     )
 
                     NavigationBarItem(
@@ -300,6 +325,13 @@ fun AppNavigation() {
                     },
                     onDeleteCategory = { category ->
                         budgetCategoryViewModel.deleteCategory(category)
+                    },
+                    onAiClick = {
+                        if (trip != null){
+                            navController.navigate(
+                                Screen.AiRecomendations.createRoute(trip.id)
+                            )
+                        }
                     }
                 )
             }
@@ -343,6 +375,53 @@ fun AppNavigation() {
 
             composable(Screen.Statistics.route) {
                 StatisticsScreen(trips = tripsWithStats)
+            }
+
+            composable(
+                route = Screen.AiRecomendations.route,
+                arguments = listOf(
+                    navArgument("tripId") {
+                        type = NavType.LongType
+                    }
+                )
+            ) { backStackEntry ->
+
+                val tripId = backStackEntry.arguments?.getLong("tripId")
+
+                val trip = tripsWithStats.find { it.trip.id == tripId }?.trip
+
+                val categories by remember(tripId) {
+                    if (tripId != null) {
+                        budgetCategoryViewModel.getCategoriesWithStats(tripId)
+                    } else {
+                        flowOf(emptyList())
+                    }
+                }.collectAsState(initial = emptyList())
+
+                val recommendation by geminiViewModel.recommendation.collectAsState()
+                val loading by geminiViewModel.loading.collectAsState()
+
+                AIRecommendationsScreen(
+                    trip = trip,
+                    categories = categories,
+                    recommendation = recommendation,
+                    loading = loading,
+                    onGenerate = { interests ->
+                        if (trip != null) {
+                            geminiViewModel.generateRecommendation(
+                                destination = trip.destination,
+                                totalBudget = trip.totalBudget,
+                                baseCurrency = trip.baseCurrency,
+                                destinationCurrency = trip.destinationCurrency,
+                                categories = categories,
+                                interests = interests
+                            )
+                        }
+                    },
+                    onBack = {
+                        navController.popBackStack()
+                    }
+                )
             }
         }
     }
