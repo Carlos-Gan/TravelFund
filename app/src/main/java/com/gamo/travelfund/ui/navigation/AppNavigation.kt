@@ -146,19 +146,6 @@ fun AppNavigation() {
                     )
 
                     NavigationBarItem(
-                        selected = currentRoute == Screen.AiRecomendations.route,
-                        onClick = {
-                            navController.navigate(Screen.AiRecomendations.route) {
-                                launchSingleTop = true
-                                popUpTo(Screen.AiRecomendations.route) {
-                                    inclusive = true
-                                }
-                            }
-                        },
-                        icon = {Icon(Icons.Default.Assistant, contentDescription = null)}
-                    )
-
-                    NavigationBarItem(
                         selected = currentRoute == Screen.Statistics.route,
                         onClick = {
                             navController.navigate(Screen.Statistics.route) {
