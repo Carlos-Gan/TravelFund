@@ -12,8 +12,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.gamo.travelfund.R
 import com.gamo.travelfund.data.model.entity.BudgetCategoryEntity
 import com.gamo.travelfund.data.stats.BudgetCategoryWithStats
 import com.gamo.travelfund.ui.components.CategoryCard
@@ -39,7 +41,7 @@ fun CategorySection(
         ) {
             Column {
                 Text(
-                    text = "Categorías",
+                    text = stringResource(R.string.categor_as),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Medium
                 )
@@ -47,7 +49,7 @@ fun CategorySection(
                 if (categories.isNotEmpty()) {
                     Text(
                         text = "$${formatAmount(totalSpent)} / $${formatAmount(totalPlanned)} $baseCurrency" +
-                                if (essentialCount > 0) " · $essentialCount esenciales" else "",
+                                if (essentialCount > 0) " · $essentialCount ${stringResource(R.string.esenciales)}" else "",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -55,7 +57,7 @@ fun CategorySection(
             }
 
             TextButton(onClick = onAddCategory) {
-                Text("+ Agregar")
+                Text(stringResource(R.string.agregar))
             }
         }
 
@@ -73,13 +75,13 @@ fun CategorySection(
                     Text("🗂️", style = MaterialTheme.typography.headlineLarge)
 
                     Text(
-                        text = "Sin categorías todavía",
+                        text = stringResource(R.string.sin_categor_as_todav_a),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
 
                     Text(
-                        text = "Organiza tu presupuesto por categorías",
+                        text = stringResource(R.string.organiza_tu_presupuesto_por_categor_as),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

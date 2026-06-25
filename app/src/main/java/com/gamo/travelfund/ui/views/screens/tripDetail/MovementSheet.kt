@@ -8,6 +8,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.gamo.travelfund.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -37,6 +39,9 @@ fun MovementSheet(
 ) {
     if (!show) return
 
+    val defaultIncomeNote = stringResource(R.string.ahorro)
+    val defaultExpenseNote = stringResource(R.string.gasto)
+
     ModalBottomSheet(
         onDismissRequest = {
             onClearForm()
@@ -52,7 +57,9 @@ fun MovementSheet(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                text = if (editingMovement == null) "Agregar movimiento" else "Editar movimiento",
+                text = if (editingMovement == null) stringResource(R.string.agregar_movimiento) else stringResource(
+                    R.string.editar_movimiento
+                ),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Medium
             )
@@ -67,14 +74,14 @@ fun MovementSheet(
                         onTypeChange("INCOME")
                         onSelectedCategoryChange(null)
                     },
-                    label = { Text("💰 Ahorro") },
+                    label = { Text("💰 ${stringResource(R.string.ahorro)}") },
                     modifier = Modifier.weight(1f)
                 )
 
                 FilterChip(
                     selected = type == "EXPENSE",
                     onClick = { onTypeChange("EXPENSE") },
-                    label = { Text("💸 Gasto") },
+                    label = { Text("💸 ${stringResource(R.string.gasto)}") },
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -106,12 +113,12 @@ fun MovementSheet(
             OutlinedTextField(
                 value = amount,
                 onValueChange = onAmountChange,
-                label = { Text("Monto") },
+                label = { Text(stringResource(R.string.monto)) },
                 prefix = { Text("$") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 isError = amount.isNotBlank() && amount.toDoubleOrNull() == null,
                 supportingText = if (amount.isNotBlank() && amount.toDoubleOrNull() == null) {
-                    { Text("Número inválido") }
+                    { Text(stringResource(R.string.n_mero_inv_lido)) }
                 } else null,
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
@@ -121,8 +128,8 @@ fun MovementSheet(
             OutlinedTextField(
                 value = note,
                 onValueChange = onNoteChange,
-                label = { Text("Nota (opcional)") },
-                placeholder = { Text("Ej. Nómina, ahorro semanal") },
+                label = { Text(stringResource(R.string.nota_opcional)) },
+                placeholder = { Text(stringResource(R.string.ej_n_mina_ahorro_semanal)) },
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth()
@@ -140,7 +147,7 @@ fun MovementSheet(
                         categoryId = if (type == "EXPENSE") selectedCategoryId else null,
                         type = MovementType.valueOf(type),
                         note = note.ifBlank {
-                            if (type == "INCOME") "Ahorro" else "Gasto"
+                            if (type == "INCOME") defaultIncomeNote else defaultExpenseNote
                         }
                     ) ?: SavingMovementEntity(
                         tripId = tripId,
@@ -148,7 +155,7 @@ fun MovementSheet(
                         amount = value,
                         type = MovementType.valueOf(type),
                         note = note.ifBlank {
-                            if (type == "INCOME") "Ahorro" else "Gasto"
+                            if (type == "INCOME") defaultIncomeNote else defaultExpenseNote
                         }
                     )
 
@@ -169,9 +176,11 @@ fun MovementSheet(
             ) {
                 Text(
                     text = if (editingMovement == null) {
-                        if (type == "INCOME") "Guardar ahorro" else "Guardar gasto"
+                        if (type == "INCOME") stringResource(R.string.guardar_ahorro) else stringResource(
+                            R.string.guardar_gasto
+                        )
                     } else {
-                        "Guardar cambios"
+                        stringResource(R.string.guardar_cambios)
                     },
                     fontWeight = FontWeight.Medium
                 )
@@ -179,7 +188,7 @@ fun MovementSheet(
 
             if (isExpenseWithoutCategory) {
                 Text(
-                    text = "Selecciona una categoría para registrar el gasto",
+                    text = stringResource(R.string.selecciona_una_categor_a_para_registrar_el_gasto),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.error
                 )

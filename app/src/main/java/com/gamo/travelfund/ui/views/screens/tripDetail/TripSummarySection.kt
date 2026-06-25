@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.gamo.travelfund.R
 import com.gamo.travelfund.ui.components.SummaryCard
 import com.gamo.travelfund.ui.components.formatAmount
 
@@ -26,7 +28,7 @@ fun TripSummarySection(
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         SummaryCard(
-            label = "Ahorrado",
+            label = stringResource(R.string.ahorrado),
             value = "$${formatAmount(realSaved)}",
             currency = baseCurrency,
             convertedValue = "$${formatAmount(convertedSaved)} $destinationCurrency",
@@ -36,7 +38,7 @@ fun TripSummarySection(
         )
 
         SummaryCard(
-            label = "Faltante",
+            label = stringResource(R.string.faltante),
             value = "$${formatAmount(missingAmount.coerceAtLeast(0.0))}",
             currency = baseCurrency,
             convertedValue = "$${formatAmount(convertedMissing)} $destinationCurrency",
@@ -46,7 +48,7 @@ fun TripSummarySection(
         )
 
         SummaryCard(
-            label = "Presupuesto",
+            label = stringResource(R.string.presupuesto),
             value = "$${formatAmount(totalBudget)}",
             currency = baseCurrency,
             convertedValue = "$${formatAmount(convertedBudget)} $destinationCurrency",

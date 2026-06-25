@@ -10,9 +10,11 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.gamo.travelfund.R
 import com.gamo.travelfund.data.model.entity.TripEntity
 import com.gamo.travelfund.data.model.entity.TripStatus
 import com.gamo.travelfund.ui.components.DatePickerField
@@ -106,11 +108,15 @@ fun AddTripScreen(
                 title = {
                     Column {
                         Text(
-                            if (isEditing) "Editar viaje" else "Nuevo viaje",
+                            if (isEditing) stringResource(R.string.editar_viaje) else stringResource(
+                                R.string.nuevo_viaje
+                            ),
                             fontWeight = FontWeight.Medium
                         )
                         Text(
-                            if (isEditing) "Modifica los datos del viaje" else "Completa los datos del viaje",
+                            if (isEditing) stringResource(R.string.modifica_los_datos_del_viaje) else stringResource(
+                                R.string.completa_los_datos_del_viaje
+                            ),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -118,7 +124,9 @@ fun AddTripScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Regresar")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(
+                            R.string.regresar
+                        ))
                     }
                 }
             )
@@ -135,15 +143,15 @@ fun AddTripScreen(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
 
-            SectionLabel("Información del viaje")
+            SectionLabel(stringResource(R.string.informaci_n_del_viaje))
 
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Nombre del viaje") },
-                placeholder = { Text("Ej. Tokio 2026") },
+                label = { Text(stringResource(R.string.nombre_del_viaje)) },
+                placeholder = { Text(stringResource(R.string.ej_tokio_2026)) },
                 isError = nameError,
-                supportingText = if (nameError) ({ Text("Mínimo 3 caracteres") }) else null,
+                supportingText = if (nameError) ({ Text(stringResource(R.string.m_nimo_3_caracteres)) }) else null,
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp)
@@ -160,7 +168,7 @@ fun AddTripScreen(
                         viewModel.onQueryChange(it)
                         expanded = true
                     },
-                    label = { Text("Destino") },
+                    label = { Text(stringResource(R.string.destino)) },
                     placeholder = { Text("Ej. Tokio") },
                     singleLine = true,
                     trailingIcon = {
@@ -195,23 +203,23 @@ fun AddTripScreen(
             }
 
             Spacer(Modifier.height(8.dp))
-            SectionLabel("Fechas")
+            SectionLabel(stringResource(R.string.fechas))
 
             DatePickerField(
-                label = "Fecha de salida",
+                label = stringResource(R.string.fecha_de_salida),
                 value = departureDate,
                 onDateSelected = { departureDate = it }
             )
 
             DatePickerField(
-                label = "Fecha de regreso",
+                label = stringResource(R.string.fecha_de_regreso),
                 value = returnDate,
                 onDateSelected = { returnDate = it }
             )
 
             if (dateError) {
                 Text(
-                    text = "La fecha de regreso debe ser después de la salida",
+                    text = stringResource(R.string.la_fecha_de_regreso_debe_ser_despu_s_de_la_salida),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(start = 16.dp, top = 2.dp)
@@ -219,7 +227,7 @@ fun AddTripScreen(
             }
 
             Spacer(Modifier.height(8.dp))
-            SectionLabel("Presupuesto")
+            SectionLabel(stringResource(R.string.presupuesto))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -229,10 +237,10 @@ fun AddTripScreen(
                     value = budget,
                     onValueChange = { budget = it },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    label = { Text("Presupuesto total") },
+                    label = { Text(stringResource(R.string.presupuesto_total)) },
                     prefix = { Text("$") },
                     isError = budgetError,
-                    supportingText = if (budgetError) ({ Text("Número inválido") }) else null,
+                    supportingText = if (budgetError) ({ Text(stringResource(R.string.n_mero_inv_lido)) }) else null,
                     singleLine = true,
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp)
@@ -240,10 +248,10 @@ fun AddTripScreen(
                 OutlinedTextField(
                     value = destinationCurrency,
                     onValueChange = { if (it.length <= 3) destinationCurrency = it.uppercase() },
-                    label = { Text("Moneda") },
+                    label = { Text(stringResource(R.string.moneda)) },
                     placeholder = { Text("USD") },
                     isError = currencyError,
-                    supportingText = if (currencyError) ({ Text("3 letras") }) else null,
+                    supportingText = if (currencyError) ({ Text(stringResource(R.string._3_letras)) }) else null,
                     singleLine = true,
                     modifier = Modifier.width(96.dp),
                     shape = RoundedCornerShape(12.dp)
@@ -283,7 +291,7 @@ fun AddTripScreen(
                     .height(52.dp)
             ) {
                 Text(
-                    if (isEditing) "Guardar cambios" else "Guardar viaje",
+                    if (isEditing) stringResource(R.string.guardar_cambios) else stringResource(R.string.guardar_viaje),
                     fontWeight = FontWeight.Medium
                 )
             }

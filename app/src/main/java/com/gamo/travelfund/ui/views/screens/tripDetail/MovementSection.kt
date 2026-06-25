@@ -7,8 +7,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.gamo.travelfund.R
 import com.gamo.travelfund.data.model.entity.MovementType
 import com.gamo.travelfund.data.model.entity.SavingMovementEntity
 import com.gamo.travelfund.ui.components.MovementRow
@@ -40,13 +42,13 @@ fun MovementSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Movimientos",
+                text = stringResource(R.string.movimientos),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Medium
             )
             if (movements.isNotEmpty()) {
                 Text(
-                    text = "${movements.size} registros",
+                    text = "${movements.size} ${stringResource(R.string.registros)}",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -66,7 +68,7 @@ fun MovementSection(
                 ) {
                     Column(Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
                         Text(
-                            text = "Entradas",
+                            text = stringResource(R.string.entradas),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.75f)
                         )
@@ -85,7 +87,7 @@ fun MovementSection(
                 ) {
                     Column(Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
                         Text(
-                            text = "Salidas",
+                            text = stringResource(R.string.salidas),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.75f)
                         )
@@ -117,12 +119,12 @@ fun MovementSection(
                     Text("💰", style = MaterialTheme.typography.displaySmall)
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        text = "Sin movimientos todavía",
+                        text = stringResource(R.string.sin_movimientos_todav_a),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "Toca + para registrar tu primer ahorro",
+                        text = stringResource(R.string.toca_para_registrar_tu_primer_ahorro),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

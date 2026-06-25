@@ -1,11 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">TravelFund</string>
-    <!-- Config -->
-    <string name="tipo_de_cambio">Tipo de cambio</string>
+    <string name="app_name">TravelFund</string>
+    <string name="tipo_de_cambio">Tipo de Cambio</string>
     <string name="avisar_si_cambia_mucho_la_moneda_del_destino">Avisar si cambia mucho la moneda del destino</string>
     <string name="sin_ahorrar_recientemente">Sin ahorrar recientemente</string>
     <string name="avisar_si_llevas_d_as_sin_registrar_ahorro">Avisar si llevas días sin registrar ahorro</string>
-    <string name="avisar_al_alcanzar_50_75_o_100">Avisar al alcanzar 50%,25%, 75% o 100%</string>
+    <string name="avisar_al_alcanzar_50_75_o_100">Avisar al alcanzar 50%, 25%, 75% o 100%</string>
     <string name="meta_de_ahorro">Meta de ahorro</string>
     <string name="avisar_cuando_falten_pocos_d_as_para_el_viaje">Avisar cuando falten pocos días para el viaje</string>
     <string name="pocos_d_as_restantes">Pocos días restantes</string>

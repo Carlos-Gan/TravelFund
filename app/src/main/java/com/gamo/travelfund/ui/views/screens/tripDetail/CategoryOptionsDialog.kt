@@ -6,6 +6,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.gamo.travelfund.R
 import com.gamo.travelfund.data.model.entity.BudgetCategoryEntity
 
 @Composable
@@ -21,10 +23,10 @@ fun CategoryOptionsDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text("Categoría")
+            Text(stringResource(R.string.categor_a))
         },
         text = {
-            Text("¿Qué quieres hacer con esta categoría?")
+            Text(stringResource(R.string.qu_quieres_hacer_con_esta_categor_a))
         },
         confirmButton = {
             TextButton(
@@ -32,7 +34,7 @@ fun CategoryOptionsDialog(
                     onEdit(category)
                 }
             ) {
-                Text("Editar")
+                Text(stringResource(R.string.editar))
             }
         },
         dismissButton = {
@@ -44,7 +46,7 @@ fun CategoryOptionsDialog(
                     contentColor = MaterialTheme.colorScheme.error
                 ),
             ) {
-                Text("Eliminar")
+                Text(stringResource(R.string.eliminar))
             }
         }
     )

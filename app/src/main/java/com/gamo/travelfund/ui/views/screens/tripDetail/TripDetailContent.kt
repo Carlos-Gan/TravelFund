@@ -12,8 +12,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.gamo.travelfund.R
 import com.gamo.travelfund.data.model.entity.*
 import com.gamo.travelfund.data.stats.BudgetCategoryWithStats
 
@@ -58,7 +60,7 @@ fun TripDetailContent(
         Scaffold(
             topBar = {
                 MediumTopAppBar(
-                    title = { Text("Detalle") },
+                    title = { Text(stringResource(R.string.detalle)) },
                     navigationIcon = {
                         IconButton(onClick = onBack) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
@@ -73,7 +75,7 @@ fun TripDetailContent(
                     .padding(padding),
                 contentAlignment = Alignment.Center
             ) {
-                Text("Viaje no encontrado")
+                Text(stringResource(R.string.viaje_no_encontrado))
             }
         }
         return
@@ -121,7 +123,7 @@ fun TripDetailContent(
                 onClick = { showMovementSheet = true },
                 shape = RoundedCornerShape(16.dp)
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Agregar movimiento")
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.agregar_movimiento))
             }
         }
     ) { padding ->
@@ -184,7 +186,7 @@ fun TripDetailContent(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                "Progreso del ahorro",
+                                stringResource(R.string.progreso_del_ahorro),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )

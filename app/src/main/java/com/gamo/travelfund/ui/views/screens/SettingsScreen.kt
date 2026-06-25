@@ -1,9 +1,9 @@
 package com.gamo.travelfund.ui.views.screens
 
-import android.Manifest
-import android.content.pm.PackageManager
-import android.os.Build
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
@@ -11,11 +11,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
+import com.gamo.travelfund.R
 import com.gamo.travelfund.data.preferences.NotificationSettings
-import com.gamo.travelfund.services.NotificationHelper
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,113 +28,196 @@ fun SettingsScreen(
     onNotifyNoSavingsChange: (Boolean) -> Unit,
     onNotifyExchangeRateChange: (Boolean) -> Unit
 ) {
-
     val context = LocalContext.current
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             MediumTopAppBar(
                 title = {
-                    Text("Configuración")
+                    Column {
+                        Text(stringResource(R.string.configuracion), fontWeight = FontWeight.Medium)
+                        Text(
+                            stringResource(R.string.personaliza_tu_experiencia),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Regresar"
-                        )
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Regresar")
                     }
                 }
             )
         }
     ) { padding ->
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
 
-            Text(
-                text = "Notificaciones",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Medium
-            )
+            // — Sección principal de notificaciones —
+            SettingsSection(label = stringResource(R.string.notificaciones)) {
 
-            SettingsSwitchItem(
-                title = "Activar notificaciones",
-                subtitle = "Recibir recordatorios sobre tus viajes y ahorros",
-                checked = settings.notificationsEnabled,
-                onCheckedChange = onNotificationsEnabledChange
-            )
+                // Switch maestro con estilo destacado
+                Surface(
+                    shape = RoundedCornerShape(16.dp),
+                    color = if (settings.notificationsEnabled)
+                        MaterialTheme.colorScheme.primaryContainer
+                    else
+                        MaterialTheme.colorScheme.surfaceVariant,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 14.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.activar_notificaciones),
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Medium,
+                                color = if (settings.notificationsEnabled)
+                                    MaterialTheme.colorScheme.onPrimaryContainer
+                                else
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                text = stringResource(R.string.recibir_recordatorios_sobre_tus_viajes_y_ahorros),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = if (settings.notificationsEnabled)
+                                    MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.75f)
+                                else
+                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f)
+                            )
+                        }
+                        Switch(
+                            checked = settings.notificationsEnabled,
+                            onCheckedChange = onNotificationsEnabledChange
+                        )
+                    }
+                }
 
-            if (settings.notificationsEnabled) {
-                SettingsSwitchItem(
-                    title = "Pocos días restantes",
-                    subtitle = "Avisar cuando falten pocos días para el viaje",
-                    checked = settings.notifyFewDays,
-                    onCheckedChange = onNotifyFewDaysChange
-                )
-
-                SettingsSwitchItem(
-                    title = "Meta de ahorro",
-                    subtitle = "Avisar cuando alcances 50%, 75% o 100%",
-                    checked = settings.notifySavingGoal,
-                    onCheckedChange = onNotifySavingGoalChange
-                )
-
-                SettingsSwitchItem(
-                    title = "Sin ahorrar recientemente",
-                    subtitle = "Avisar si llevas varios días sin registrar ahorro",
-                    checked = settings.notifyNoSavings,
-                    onCheckedChange = onNotifyNoSavingsChange
-                )
-
-                SettingsSwitchItem(
-                    title = "Tipo de cambio",
-                    subtitle = "Avisar si cambia mucho la moneda del destino",
-                    checked = settings.notifyExchangeRate,
-                    onCheckedChange = onNotifyExchangeRateChange
-                )
+                // Sub-opciones — solo visibles si las notificaciones están activas
+                if (settings.notificationsEnabled) {
+                    Card(
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surface
+                        ),
+                        border = androidx.compose.foundation.BorderStroke(
+                            0.5.dp, MaterialTheme.colorScheme.outlineVariant
+                        ),
+                        elevation = CardDefaults.cardElevation(0.dp)
+                    ) {
+                        Column {
+                            SettingsSwitchItem(
+                                emoji = "📅",
+                                title = stringResource(R.string.pocos_d_as_restantes),
+                                subtitle = stringResource(R.string.avisar_cuando_falten_pocos_d_as_para_el_viaje),
+                                checked = settings.notifyFewDays,
+                                onCheckedChange = onNotifyFewDaysChange
+                            )
+                            SettingsDivider()
+                            SettingsSwitchItem(
+                                emoji = "🎯",
+                                title = stringResource(R.string.meta_de_ahorro),
+                                subtitle = stringResource(R.string.avisar_al_alcanzar_50_75_o_100),
+                                checked = settings.notifySavingGoal,
+                                onCheckedChange = onNotifySavingGoalChange
+                            )
+                            SettingsDivider()
+                            SettingsSwitchItem(
+                                emoji = "💤",
+                                title = stringResource(R.string.sin_ahorrar_recientemente),
+                                subtitle = stringResource(R.string.avisar_si_llevas_d_as_sin_registrar_ahorro),
+                                checked = settings.notifyNoSavings,
+                                onCheckedChange = onNotifyNoSavingsChange
+                            )
+                            SettingsDivider()
+                            SettingsSwitchItem(
+                                emoji = "💱",
+                                title = stringResource(R.string.tipo_de_cambio),
+                                subtitle = stringResource(R.string.avisar_si_cambia_mucho_la_moneda_del_destino),
+                                checked = settings.notifyExchangeRate,
+                                onCheckedChange = onNotifyExchangeRateChange
+                            )
+                        }
+                    }
+                }
             }
+
+            Spacer(Modifier.height(16.dp))
         }
     }
 }
 
+// — Sección con label —
+@Composable
+private fun SettingsSection(
+    label: String,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.padding(start = 4.dp)
+        )
+        content()
+    }
+}
+
+// — Item individual dentro de la card —
 @Composable
 private fun SettingsSwitchItem(
+    emoji: String,
     title: String,
     subtitle: String,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth()
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(title, fontWeight = FontWeight.Medium)
-                Text(
-                    subtitle,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            Switch(
-                checked = checked,
-                onCheckedChange = onCheckedChange,
+        Text(emoji, style = MaterialTheme.typography.titleMedium)
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface
             )
-
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
+        Switch(checked = checked, onCheckedChange = onCheckedChange)
     }
+}
+
+// — Divider interno de la card —
+@Composable
+private fun SettingsDivider() {
+    HorizontalDivider(
+        modifier = Modifier.padding(horizontal = 16.dp),
+        thickness = 0.5.dp,
+        color = MaterialTheme.colorScheme.outlineVariant
+    )
 }

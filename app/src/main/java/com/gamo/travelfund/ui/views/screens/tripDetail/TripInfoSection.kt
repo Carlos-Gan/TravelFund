@@ -3,9 +3,11 @@ package com.gamo.travelfund.ui.views.screens.tripDetail
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import com.gamo.travelfund.R
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.gamo.travelfund.ui.components.formatDateTime
@@ -25,7 +27,7 @@ fun TripInfoSection(
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
 
             Text(
-                text = "Información del viaje",
+                text = stringResource(R.string.informaci_n_del_viaje),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Medium
@@ -40,7 +42,7 @@ fun TripInfoSection(
             ) {
                 DateBlock(
                     emoji = "✈️",
-                    label = "Salida",
+                    label = stringResource(R.string.salida),
                     date = formatDateTime(departureDateMillis),
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -48,7 +50,7 @@ fun TripInfoSection(
                 )
                 DateBlock(
                     emoji = "🏠",
-                    label = "Regreso",
+                    label = stringResource(R.string.regresar),
                     date = formatDateTime(returnDateMillis),
                     containerColor = MaterialTheme.colorScheme.secondaryContainer,
                     contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -63,7 +65,7 @@ fun TripInfoSection(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "💱 Moneda destino",
+                    text = "💱 ${stringResource(R.string.moneda_destino)}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

@@ -1,5 +1,6 @@
 package com.gamo.travelfund.ui.views.screens
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -14,18 +15,22 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.gamo.travelfund.R
 import com.gamo.travelfund.data.model.entity.TripEntity
 import com.gamo.travelfund.data.model.entity.TripStatus
 import com.gamo.travelfund.data.stats.TripWithStats
 import com.gamo.travelfund.ui.components.TripCard
 
-enum class TripFilter(val label: String) {
-    TODOS("Todos"),
-    ACTIVOS("Activos"),
-    TERMINADOS("Terminados")
+enum class TripFilter(
+    @StringRes val labelRes: Int
+) {
+    TODOS(R.string.todos),
+    ACTIVOS(R.string.activos),
+    TERMINADOS(R.string.terminados)
 }
 
 @Composable
@@ -63,7 +68,7 @@ fun HomeScreen(
                 selectedTrip = null
             },
             title = { Text(selectedTrip!!.name, fontWeight = FontWeight.Medium) },
-            text = { Text("¿Qué quieres hacer con este viaje?") },
+            text = { Text(stringResource(R.string.qu_quieres_hacer_con_este_viaje)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -72,7 +77,7 @@ fun HomeScreen(
                         selectedTrip = null
                     }
                 ) {
-                    Text("Editar")
+                    Text(stringResource(R.string.editar))
                 }
             },
             dismissButton = {
@@ -85,7 +90,7 @@ fun HomeScreen(
                         contentColor = MaterialTheme.colorScheme.error
                     )
                 ) {
-                    Text("Eliminar")
+                    Text(stringResource(R.string.eliminar))
                 }
             }
         )
@@ -98,9 +103,12 @@ fun HomeScreen(
                 showDeleteDialog = false
                 selectedTrip = null
             },
-            title = { Text("Eliminar viaje") },
+            title = { Text(stringResource(R.string.eliminar_viaje)) },
             text = {
-                Text("¿Estás seguro de que quieres eliminar \"${selectedTrip!!.name}\"? Esta acción no se puede deshacer.")
+                Text("${stringResource(R.string.est_s_seguro_de_que_quieres_eliminar)} \"${selectedTrip!!.name}\"? ${
+                    stringResource(
+                        R.string.esta_acci_n_no_se_puede_deshacer
+                    )}")
             },
             confirmButton = {
                 Button(
@@ -115,7 +123,7 @@ fun HomeScreen(
                     ),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("Eliminar")
+                    Text(stringResource(R.string.eliminar))
                 }
             },
             dismissButton = {
@@ -125,7 +133,7 @@ fun HomeScreen(
                         selectedTrip = null
                     }
                 ) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.cancelar))
                 }
             }
         )
@@ -139,7 +147,7 @@ fun HomeScreen(
                 shape = RoundedCornerShape(16.dp),
                 elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 4.dp)
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Agregar viaje")
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.agregar_viaje))
             }
         }
     ) { padding ->
@@ -158,21 +166,25 @@ fun HomeScreen(
             ) {
                 Column {
                     Text(
-                        text = "Mis viajes",
+                        text = stringResource(R.string.mis_viajes),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Medium
                     )
                     if (trips.isNotEmpty()) {
                         Spacer(Modifier.height(2.dp))
                         Text(
-                            text = "${trips.size} viaje${if (trips.size != 1) "s" else ""}",
+                            text = stringResource(
+                                R.string.viaje,
+                                trips.size,
+                                if (trips.size != 1) "s" else ""
+                            ),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
                 IconButton(onClick = onSettingsClick) {
-                    Icon(Icons.Default.ClearAll, contentDescription = "Configuración")
+                    Icon(Icons.Default.ClearAll, contentDescription = stringResource(R.string.configuracion))
                 }
             }
 
@@ -186,7 +198,7 @@ fun HomeScreen(
                         FilterChip(
                             selected = selectedFilter == filter,
                             onClick = { selectedFilter = filter },
-                            label = { Text(filter.label) },
+                            label = { Text(stringResource(filter.labelRes)) },
                             leadingIcon = if (selectedFilter == filter) {
                                 {
                                     Icon(
@@ -207,15 +219,15 @@ fun HomeScreen(
                 // No hay viajes en absoluto
                 trips.isEmpty() -> EmptyState(
                     emoji = "✈️",
-                    title = "Sin viajes todavía",
-                    subtitle = "Empieza a planear tu próxima aventura y lleva el seguimiento de tus ahorros."
+                    title = stringResource(R.string.sin_viajes_todav_a),
+                    subtitle = stringResource(R.string.empieza_a_planear_tu_pr_xima_aventura_y_lleva_el_seguimiento_de_tus_ahorros)
                 )
 
                 // Hay viajes pero el filtro no muestra ninguno
                 filteredTrips.isEmpty() -> EmptyState(
                     emoji = "🔍",
-                    title = "Sin resultados",
-                    subtitle = "No tienes viajes en esta categoría todavía."
+                    title = stringResource(R.string.sin_resultados),
+                    subtitle = stringResource(R.string.no_tienes_viajes_en_esta_categoria_todavia)
                 )
 
                 else -> LazyColumn(

@@ -9,20 +9,22 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.gamo.travelfund.R
 import com.gamo.travelfund.data.model.entity.BudgetCategoryEntity
 
 private val categorySuggestions = listOf(
-    "✈️" to "Vuelos",
-    "🏨" to "Hospedaje",
-    "🍽️" to "Comida",
-    "🎭" to "Entrete.",
-    "🚕" to "Transporte",
-    "🛍️" to "Compras",
-    "💊" to "Salud",
-    "📋" to "Otro"
+    "✈️" to R.string.vuelos,
+    "🏨" to R.string.hospedaje,
+    "🍽️" to R.string.comida,
+    "🎭" to R.string.entrete,
+    "🚕" to R.string.transporte,
+    "🛍️" to R.string.compras,
+    "💊" to R.string.salud,
+    "📋" to R.string.otro
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,14 +66,16 @@ fun CategorySheet(
 
             // — Título —
             Text(
-                text = if (isEditing) "Editar categoría" else "Nueva categoría",
+                text = if (isEditing) stringResource(R.string.editar_categor_a) else stringResource(
+                    R.string.nueva_categor_a
+                ),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Medium
             )
 
             // — Chips de sugerencias en un FlowRow —
             Text(
-                text = "Sugerencias",
+                text = stringResource(R.string.sugerencias),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -79,7 +83,8 @@ fun CategorySheet(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                items(categorySuggestions) { (emoji, name) ->
+                items(categorySuggestions) { (emoji, resId) ->
+                    val name = stringResource(resId)
                     val isSelected = categoryEmoji == emoji && categoryName == name
                     FilterChip(
                         selected = isSelected,
@@ -115,8 +120,8 @@ fun CategorySheet(
                 OutlinedTextField(
                     value = categoryName,
                     onValueChange = onCategoryNameChange,
-                    label = { Text("Nombre") },
-                    placeholder = { Text("Ej. Hospedaje") },
+                    label = { Text(stringResource(R.string.nombre)) },
+                    placeholder = { Text(stringResource(R.string.ej_hospedaje)) },
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.weight(1f)
@@ -127,11 +132,11 @@ fun CategorySheet(
             OutlinedTextField(
                 value = categoryAmount,
                 onValueChange = onCategoryAmountChange,
-                label = { Text("Presupuesto planeado") },
+                label = { Text(stringResource(R.string.presupuesto_planeado)) },
                 prefix = { Text("$") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 isError = amountError,
-                supportingText = if (amountError) ({ Text("Número inválido") }) else null,
+                supportingText = if (amountError) ({ Text(stringResource(R.string.n_mero_inv_lido)) }) else null,
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth()
@@ -144,9 +149,12 @@ fun CategorySheet(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
-                    Text("Gasto esencial", style = MaterialTheme.typography.bodyMedium)
                     Text(
-                        text = "Vuelo, hotel, seguro...",
+                        stringResource(R.string.gasto_esencial),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        text = stringResource(R.string.vuelo_hotel_seguro),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -184,7 +192,9 @@ fun CategorySheet(
                     .height(52.dp)
             ) {
                 Text(
-                    text = if (isEditing) "Actualizar categoría" else "Guardar categoría",
+                    text = if (isEditing) stringResource(R.string.actualizar_categor_a) else stringResource(
+                        R.string.guardar_categor_a
+                    ),
                     fontWeight = FontWeight.Medium
                 )
             }
