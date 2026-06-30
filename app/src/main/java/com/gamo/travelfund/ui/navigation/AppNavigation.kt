@@ -40,6 +40,7 @@ import com.gamo.travelfund.data.repository.GeminiRepository
 import com.gamo.travelfund.data.repository.SavingMovementRepository
 import com.gamo.travelfund.data.repository.TripRepository
 import com.gamo.travelfund.services.NotificationHelper
+import com.gamo.travelfund.ui.components.TravelFundNavigationBar
 import com.gamo.travelfund.ui.views.modelFactory.BudgetCategoryViewModelFactory
 import com.gamo.travelfund.ui.views.modelFactory.CurrencyViewModelFactory
 import com.gamo.travelfund.ui.views.modelFactory.GeminiViewModelFactory
@@ -131,40 +132,9 @@ fun AppNavigation() {
     Scaffold(
         bottomBar = {
             if (showBottomBar) {
-                NavigationBar {
-                    NavigationBarItem(
-                        selected = currentRoute == Screen.Home.route,
-                        onClick = {
-                            navController.navigate(Screen.Home.route) {
-                                launchSingleTop = true
-                                popUpTo(Screen.Home.route) {
-                                    inclusive = true
-                                }
-                            }
-                        },
-                        icon = { Icon(Icons.Default.Home, contentDescription = null) }
-                    )
-
-                    NavigationBarItem(
-                        selected = currentRoute == Screen.Statistics.route,
-                        onClick = {
-                            navController.navigate(Screen.Statistics.route) {
-                                launchSingleTop = true
-                            }
-                        },
-                        icon = { Icon(Icons.Default.BarChart, contentDescription = null) }
-                    )
-                    NavigationBarItem(
-                        selected = currentRoute == Screen.Settings.route,
-                        onClick = {
-                            navController.navigate(Screen.Settings.route) {
-                                launchSingleTop = true
-                            }
-                        },
-                        icon = { Icon(Icons.Default.Settings, contentDescription = null) }
-
-                    )
-                }
+                TravelFundNavigationBar(
+                    navController = navController,
+                )
             }
         }
     )
@@ -349,9 +319,6 @@ fun AppNavigation() {
 
                 SettingsScreen(
                     settings = settings,
-                    onBack = {
-                        navController.popBackStack()
-                    },
                     onNotificationsEnabledChange = settingsViewModel::setNotificationsEnabled,
                     onNotifyFewDaysChange = settingsViewModel::setNotifyFewDays,
                     onNotifySavingGoalChange = settingsViewModel::setNotifySavingGoal,

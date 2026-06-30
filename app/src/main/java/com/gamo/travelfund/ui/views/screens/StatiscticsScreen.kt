@@ -1,320 +1,436 @@
 package com.gamo.travelfund.ui.views.screens
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.gamo.travelfund.R
 import com.gamo.travelfund.data.model.entity.TripStatus
 import com.gamo.travelfund.data.stats.TripWithStats
 import com.gamo.travelfund.ui.components.formatAmount
+import com.gamo.travelfund.ui.components.statistics.EmptyStatisticsState
+import com.gamo.travelfund.ui.components.statistics.StatisticsSectionHeader
+import com.gamo.travelfund.ui.components.statistics.TripRankingCard
+import com.gamo.travelfund.ui.components.statistics.progress
+
+/**
+ * Progreso de ahorro del viaje.
+ *
+ * Puede ser superior a 1.0 cuando el usuario ahorró más
+ * que el presupuesto establecido.
+ */
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StatisticsScreen(trips: List<TripWithStats>) {
+fun StatisticsScreen(
+    trips: List<TripWithStats>
+) {
+    val totalTrips = trips.size
 
-    val totalTrips    = trips.size
-    val totalBudget   = remember(trips) { trips.sumOf { it.trip.totalBudget } }
-    val totalSaved    = remember(trips) { trips.sumOf { it.savedAmount } }
-    val missingAmount = (totalBudget - totalSaved).coerceAtLeast(0.0)
-    val averageProgress = if (totalBudget > 0) (totalSaved / totalBudget * 100).toInt() else 0
-    val globalProgress  = if (totalBudget > 0) (totalSaved / totalBudget).toFloat().coerceIn(0f, 1f) else 0f
-
-    val activeTrips   = remember(trips) { trips.count { it.trip.status == TripStatus.ACTIVE || it.trip.status == TripStatus.PLANNED } }
-    val finishedTrips = remember(trips) { trips.count { it.trip.status == TripStatus.FINISHED } }
-
-    val bestTrip = remember(trips) {
-        trips.maxByOrNull { if (it.trip.totalBudget > 0) it.savedAmount / it.trip.totalBudget else 0.0 }
+    val totalBudget = remember(trips) {
+        trips.sumOf { it.trip.totalBudget }
     }
+
+    val totalSaved = remember(trips) {
+        trips.sumOf { it.savedAmount }
+    }
+
+    val missingAmount = remember(totalBudget, totalSaved) {
+        (totalBudget - totalSaved).coerceAtLeast(0.0)
+    }
+
+    val averageProgress = remember(totalBudget, totalSaved) {
+        if (totalBudget > 0) {
+            ((totalSaved / totalBudget) * 100).toInt()
+        } else {
+            0
+        }
+    }
+
+    val globalProgress = remember(totalBudget, totalSaved) {
+        if (totalBudget > 0) {
+            (totalSaved / totalBudget)
+                .toFloat()
+                .coerceIn(0f, 1f)
+        } else {
+            0f
+        }
+    }
+
+    val activeTrips = remember(trips) {
+        trips.count {
+            it.trip.status == TripStatus.ACTIVE ||
+                    it.trip.status == TripStatus.PLANNED
+        }
+    }
+
+    val finishedTrips = remember(trips) {
+        trips.count {
+            it.trip.status == TripStatus.FINISHED
+        }
+    }
+
     val sortedTrips = remember(trips) {
-        trips.sortedByDescending { if (it.trip.totalBudget > 0) it.savedAmount / it.trip.totalBudget else 0.0 }
+        trips.sortedByDescending { it.progress }
     }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            MediumTopAppBar(
+            CenterAlignedTopAppBar(
                 title = {
-                    Column {
-                        Text("Estadísticas", fontWeight = FontWeight.Medium)
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         Text(
-                            "Resumen de todos tus viajes",
-                            style = MaterialTheme.typography.labelSmall,
+                            text = stringResource(R.string.estadisticas),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.SemiBold
+                        )
+
+                        Text(
+                            text = stringResource(
+                                R.string.resumen_de_todos_tus_viajes
+                            ),
+                            style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    scrolledContainerColor = Color.Unspecified,
+                    navigationIconContentColor = Color.Unspecified,
+                    titleContentColor = Color.Unspecified,
+                    actionIconContentColor = Color.Unspecified
+                )
             )
         }
-    ) { padding ->
+    ) { paddingValues ->
 
         if (trips.isEmpty()) {
-            Box(
-                modifier = Modifier.fillMaxSize().padding(padding),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text("📊", style = MaterialTheme.typography.displayMedium)
-                    Text("Sin datos todavía", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
-                    Text(
-                        "Agrega tu primer viaje para ver estadísticas",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
+            EmptyStatisticsState(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            )
+
             return@Scaffold
         }
 
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(padding),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            contentPadding = PaddingValues(
+                start = 16.dp,
+                top = 12.dp,
+                end = 16.dp,
+                bottom = 32.dp
+            ),
+            verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
 
-            // — Progreso global —
             item {
-                Card(
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-                    elevation = CardDefaults.cardElevation(0.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier.padding(20.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.Bottom
-                        ) {
-                            Column {
-                                Text(
-                                    text = "Progreso global",
-                                    style = MaterialTheme.typography.labelMedium,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.75f)
-                                )
-                                Text(
-                                    text = "$averageProgress%",
-                                    style = MaterialTheme.typography.displaySmall,
-                                    fontWeight = FontWeight.Medium,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                                )
-                            }
-                            Column(horizontalAlignment = Alignment.End) {
-                                Text(
-                                    text = "Ahorrado",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.75f)
-                                )
-                                Text(
-                                    text = "$${formatAmount(totalSaved)}",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Medium,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                                )
-                                Text(
-                                    text = "de $${formatAmount(totalBudget)} MXN",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f)
-                                )
-                            }
-                        }
-                        LinearProgressIndicator(
-                            progress = { globalProgress },
-                            modifier = Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(8.dp)),
-                            color = MaterialTheme.colorScheme.primary,
-                            trackColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.15f)
-                        )
-                    }
-                }
-            }
-
-            // — Tarjetas de resumen —
-            item {
-                StatsSectionLabel("Resumen general")
+                GlobalProgressCard(
+                    averageProgress = averageProgress,
+                    globalProgress = globalProgress,
+                    totalSaved = totalSaved,
+                    totalBudget = totalBudget
+                )
             }
 
             item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    MiniStatCard("✈️", "Viajes", totalTrips.toString(), "registrados", Modifier.weight(1f))
-                    MiniStatCard("🟢", "Activos", activeTrips.toString(), "en curso", Modifier.weight(1f))
-                    MiniStatCard("✅", "Terminados", finishedTrips.toString(), "completados", Modifier.weight(1f))
-                }
+                StatisticsSectionHeader(
+                    title = stringResource(R.string.resumen_general)
+                )
             }
 
             item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    MiniStatCard(
-                        emoji = "💰",
-                        title = "Ahorrado",
-                        value = "$${formatAmount(totalSaved)}",
-                        subtitle = "MXN",
-                        modifier = Modifier.weight(1f),
-                        valueColor = MaterialTheme.colorScheme.primary
-                    )
-                    MiniStatCard(
-                        emoji = "⏳",
-                        title = "Faltante",
-                        value = "$${formatAmount(missingAmount)}",
-                        subtitle = "MXN",
-                        modifier = Modifier.weight(1f),
-                        valueColor = MaterialTheme.colorScheme.error
-                    )
-                }
+                StatisticsGrid(
+                    totalTrips = totalTrips,
+                    activeTrips = activeTrips,
+                    finishedTrips = finishedTrips,
+                    missingAmount = missingAmount
+                )
             }
 
-            // — Ranking de viajes —
             item {
-                StatsSectionLabel("Ranking por progreso")
+                Spacer(modifier = Modifier.height(2.dp))
             }
 
-            items(sortedTrips, key = { it.trip.id }) { tripWithStats ->
-                val progress = if (tripWithStats.trip.totalBudget > 0)
-                    (tripWithStats.savedAmount / tripWithStats.trip.totalBudget).toFloat().coerceIn(0f, 1f)
-                else 0f
-                val progressPercent = (progress * 100).toInt()
-
-                Card(
-                    shape = RoundedCornerShape(14.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    border = androidx.compose.foundation.BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant),
-                    elevation = CardDefaults.cardElevation(0.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier.padding(14.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = tripWithStats.trip.name,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.Medium,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                                Text(
-                                    text = tripWithStats.trip.destination,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                            Text(
-                                text = "$progressPercent%",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Medium,
-                                color = when {
-                                    progress >= 1f   -> MaterialTheme.colorScheme.tertiary
-                                    progress >= 0.7f -> MaterialTheme.colorScheme.primary
-                                    progress >= 0.4f -> MaterialTheme.colorScheme.secondary
-                                    else             -> MaterialTheme.colorScheme.error
-                                }
-                            )
-                        }
-                        LinearProgressIndicator(
-                            progress = { progress },
-                            modifier = Modifier.fillMaxWidth().height(4.dp).clip(RoundedCornerShape(8.dp)),
-                            color = when {
-                                progress >= 1f   -> MaterialTheme.colorScheme.tertiary
-                                progress >= 0.7f -> MaterialTheme.colorScheme.primary
-                                progress >= 0.4f -> MaterialTheme.colorScheme.secondary
-                                else             -> MaterialTheme.colorScheme.error
-                            },
-                            trackColor = MaterialTheme.colorScheme.surfaceVariant
-                        )
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                text = "Ahorrado: $${formatAmount(tripWithStats.savedAmount)}",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Text(
-                                text = "Meta: $${formatAmount(tripWithStats.trip.totalBudget)}",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-                }
+            item {
+                StatisticsSectionHeader(
+                    title = stringResource(R.string.ranking_por_progreso),
+                    amount = sortedTrips.size
+                )
             }
 
-            item { Spacer(Modifier.height(16.dp)) }
+            itemsIndexed(
+                items = sortedTrips,
+                key = { _, item -> item.trip.id }
+            ) { index, tripWithStats ->
+
+                TripRankingCard(
+                    position = index + 1,
+                    tripWithStats = tripWithStats
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun StatsSectionLabel(text: String) {
-    Text(
-        text = text,
-        style = MaterialTheme.typography.labelMedium,
-        color = MaterialTheme.colorScheme.primary,
-        fontWeight = FontWeight.Medium,
-        modifier = Modifier.padding(start = 2.dp)
+private fun GlobalProgressCard(
+    averageProgress: Int,
+    globalProgress: Float,
+    totalSaved: Double,
+    totalBudget: Double
+) {
+    val animatedProgress by animateFloatAsState(
+        targetValue = globalProgress,
+        animationSpec = tween(durationMillis = 700),
+        label = "globalProgress"
     )
+
+    val cardShape = RoundedCornerShape(28.dp)
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(cardShape)
+            .background(
+                brush = Brush.linearGradient(
+                    colors = listOf(
+                        MaterialTheme.colorScheme.primaryContainer,
+                        MaterialTheme.colorScheme.tertiaryContainer
+                    )
+                )
+            )
+            .padding(22.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(22.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier.size(96.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    progress = { animatedProgress },
+                    modifier = Modifier.fillMaxSize(),
+                    strokeWidth = 9.dp,
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.surface.copy(
+                        alpha = 0.45f
+                    )
+                )
+
+                Text(
+                    text = "$averageProgress%",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            }
+
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.progreso_global),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(
+                        alpha = 0.75f
+                    )
+                )
+
+                Text(
+                    text = "$${formatAmount(totalSaved)}",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Text(
+                    text = stringResource(R.string.ahorrado),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(
+                        alpha = 0.8f
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = "${stringResource(R.string.meta)}: " +
+                            "$${formatAmount(totalBudget)} MXN",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(
+                        alpha = 0.7f
+                    ),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+    }
 }
 
 @Composable
-private fun MiniStatCard(
-    emoji: String,
+private fun StatisticsGrid(
+    totalTrips: Int,
+    activeTrips: Int,
+    finishedTrips: Int,
+    missingAmount: Double
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            ModernStatCard(
+                icon = Icons.Default.Place,
+                title = stringResource(R.string.viajes),
+                value = totalTrips.toString(),
+                subtitle = stringResource(R.string.registrados),
+                accentColor = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.weight(1f)
+            )
+
+            ModernStatCard(
+                icon = Icons.Default.DateRange,
+                title = stringResource(R.string.activos),
+                value = activeTrips.toString(),
+                subtitle = stringResource(R.string.en_curso),
+                accentColor = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            ModernStatCard(
+                icon = Icons.Default.Check,
+                title = stringResource(R.string.terminados),
+                value = finishedTrips.toString(),
+                subtitle = stringResource(R.string.completados),
+                accentColor = MaterialTheme.colorScheme.tertiary,
+                modifier = Modifier.weight(1f)
+            )
+
+            ModernStatCard(
+                icon = Icons.Default.Info,
+                title = stringResource(R.string.faltante),
+                value = "$${formatAmount(missingAmount)}",
+                subtitle = "MXN",
+                accentColor = MaterialTheme.colorScheme.error,
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+}
+
+@Composable
+private fun ModernStatCard(
+    icon: ImageVector,
     title: String,
     value: String,
     subtitle: String,
-    modifier: Modifier = Modifier,
-    valueColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSurface
+    accentColor: Color,
+    modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier,
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = androidx.compose.foundation.BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant),
-        elevation = CardDefaults.cardElevation(0.dp)
+        modifier = modifier.heightIn(min = 138.dp),
+        shape = RoundedCornerShape(22.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 2.dp
+        )
     ) {
         Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(emoji, style = MaterialTheme.typography.titleSmall)
+            Surface(
+                modifier = Modifier.size(42.dp),
+                shape = CircleShape,
+                color = accentColor.copy(alpha = 0.12f)
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = accentColor,
+                        modifier = Modifier.size(21.dp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
+
             Text(
                 text = value,
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Medium,
-                color = valueColor
+                fontWeight = FontWeight.Bold,
+                color = accentColor,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
+
             Text(
                 text = title,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurface
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
+
             Text(
                 text = subtitle,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         }
     }

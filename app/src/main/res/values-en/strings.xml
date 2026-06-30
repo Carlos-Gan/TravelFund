@@ -103,4 +103,57 @@
     <string name="sin_categor_as_todav_a">No categories yet</string>
     <string name="qu_quieres_hacer_con_este_movimiento">What do you want to do with this movement?</string>
     <string name="qu_quieres_hacer_con_esta_categor_a">What do you want to do with this category?</string>
+
+    <!-- 60-day reminder -->
+    <string name="reminder_60_title">Your trip is on the way 🌎</string>
+    <string name="reminder_60_message">60 days remaining. You can start organizing your budget.</string>
+
+    <!-- 30-day reminder -->
+    <string name="reminder_30_title">The countdown begins 🗓️</string>
+    <string name="reminder_30_message">30 days remaining. It is a good time to review your budget.</string>
+
+    <!-- 15-day reminder -->
+    <string name="reminder_15_title">It is getting closer 👀</string>
+    <string name="reminder_15_message">15 days remaining. Check if you still need to book anything.</string>
+
+    <!-- 7-day reminder -->
+    <string name="reminder_7_title">Exactly one week ⏳</string>
+    <string name="reminder_7_message">7 days remaining. It is a good time to start preparing your luggage.</string>
+
+    <!-- 5-day reminder -->
+    <string name="reminder_5_title">Almost there 🔥</string>
+    <string name="reminder_5_message">5 days remaining. Review your documents and reservations.</string>
+
+    <!-- 3-day reminder -->
+    <string name="reminder_3_title">It feels close! 🎒</string>
+    <string name="reminder_3_message">3 days remaining. It is time to start packing.</string>
+
+    <!-- 2-day reminder -->
+    <string name="reminder_2_title">Final preparations 📋</string>
+    <string name="reminder_2_message">2 days remaining. Confirm your transportation and accommodation.</string>
+
+    <!-- 1-day reminder -->
+    <string name="reminder_1_title">It is tomorrow! ✈️</string>
+    <string name="reminder_1_message">Your trip is tomorrow. Prepare everything tonight.</string>
+
+    <!-- Generic reminder -->
+    <string name="reminder_default_title">Upcoming trip ✈️</string>
+    <string name="reminder_default_message">Your trip is getting closer.</string>
+    <string name="meta">Goal</string>
+
+    <string name="estadisticas">Statistics</string>
+    <string name="resumen_de_todos_tus_viajes">Summary of all your trips</string>
+    <string name="sin_datos_todavia">No data yet</string>
+    <string name="agrega_tu_primer_viaje">Add your first trip to see statistics</string>
+    <string name="progreso_global">Overall progress</string>
+    <string name="de_monto_mxn">of $%1$s MXN</string>
+    <string name="resumen_general">General summary</string>
+    <string name="registrados">registered</string>
+    <string name="en_curso">in progress</string>
+    <string name="completados">completed</string>
+    <string name="viajes">Trips</string>
+    <string name="ranking_por_progreso">Ranking by progress</string>
+    <string name="version_label">Version %1$s</string>
+    <string name="inicio">Home</string>
+
 </resources>

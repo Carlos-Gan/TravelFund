@@ -33,6 +33,7 @@ enum class TripFilter(
     TERMINADOS(R.string.terminados)
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     trips: List<TripWithStats>,
@@ -105,10 +106,13 @@ fun HomeScreen(
             },
             title = { Text(stringResource(R.string.eliminar_viaje)) },
             text = {
-                Text("${stringResource(R.string.est_s_seguro_de_que_quieres_eliminar)} \"${selectedTrip!!.name}\"? ${
-                    stringResource(
-                        R.string.esta_acci_n_no_se_puede_deshacer
-                    )}")
+                Text(
+                    "${stringResource(R.string.est_s_seguro_de_que_quieres_eliminar)} \"${selectedTrip!!.name}\"? ${
+                        stringResource(
+                            R.string.esta_acci_n_no_se_puede_deshacer
+                        )
+                    }"
+                )
             },
             confirmButton = {
                 Button(
@@ -149,6 +153,30 @@ fun HomeScreen(
             ) {
                 Icon(Icons.Default.Add, contentDescription = stringResource(R.string.agregar_viaje))
             }
+        },
+        topBar = {
+            TopAppBar(
+                title = {
+                    Column {
+                        Text(
+                            text = stringResource(R.string.mis_viajes),
+                            fontWeight = FontWeight.Medium
+                        )
+                        if (trips.isNotEmpty()) {
+                            Spacer(Modifier.height(2.dp))
+                            Text(
+                                text = stringResource(
+                                    R.string.viaje,
+                                    trips.size,
+                                    if (trips.size != 1) "s" else ""
+                                ),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                },
+            )
         }
     ) { padding ->
         Column(
@@ -156,35 +184,6 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            // — Header —
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Bottom
-            ) {
-                Column {
-                    Text(
-                        text = stringResource(R.string.mis_viajes),
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Medium
-                    )
-                    if (trips.isNotEmpty()) {
-                        Spacer(Modifier.height(2.dp))
-                        Text(
-                            text = stringResource(
-                                R.string.viaje,
-                                trips.size,
-                                if (trips.size != 1) "s" else ""
-                            ),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            }
-
             // — Filtros —
             if (trips.isNotEmpty()) {
                 LazyRow(

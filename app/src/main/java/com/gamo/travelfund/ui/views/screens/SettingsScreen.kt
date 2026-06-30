@@ -1,5 +1,6 @@
 package com.gamo.travelfund.ui.views.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,10 +11,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.gamo.travelfund.BuildConfig
 import com.gamo.travelfund.R
 import com.gamo.travelfund.data.preferences.NotificationSettings
 
@@ -21,19 +23,16 @@ import com.gamo.travelfund.data.preferences.NotificationSettings
 @Composable
 fun SettingsScreen(
     settings: NotificationSettings,
-    onBack: () -> Unit,
     onNotificationsEnabledChange: (Boolean) -> Unit,
     onNotifyFewDaysChange: (Boolean) -> Unit,
     onNotifySavingGoalChange: (Boolean) -> Unit,
     onNotifyNoSavingsChange: (Boolean) -> Unit,
     onNotifyExchangeRateChange: (Boolean) -> Unit
 ) {
-    val context = LocalContext.current
-
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            MediumTopAppBar(
+            TopAppBar(
                 title = {
                     Column {
                         Text(stringResource(R.string.configuracion), fontWeight = FontWeight.Medium)
@@ -42,11 +41,6 @@ fun SettingsScreen(
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Regresar")
                     }
                 }
             )
@@ -65,12 +59,19 @@ fun SettingsScreen(
             SettingsSection(label = stringResource(R.string.notificaciones)) {
 
                 // Switch maestro con estilo destacado
+                val masterContainerColor = if (settings.notificationsEnabled)
+                    MaterialTheme.colorScheme.primaryContainer
+                else
+                    MaterialTheme.colorScheme.surfaceVariant
+
+                val masterContentColor = if (settings.notificationsEnabled)
+                    MaterialTheme.colorScheme.onPrimaryContainer
+                else
+                    MaterialTheme.colorScheme.onSurfaceVariant
+
                 Surface(
                     shape = RoundedCornerShape(16.dp),
-                    color = if (settings.notificationsEnabled)
-                        MaterialTheme.colorScheme.primaryContainer
-                    else
-                        MaterialTheme.colorScheme.surfaceVariant,
+                    color = masterContainerColor,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(
@@ -85,18 +86,12 @@ fun SettingsScreen(
                                 text = stringResource(R.string.activar_notificaciones),
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.Medium,
-                                color = if (settings.notificationsEnabled)
-                                    MaterialTheme.colorScheme.onPrimaryContainer
-                                else
-                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                color = masterContentColor
                             )
                             Text(
                                 text = stringResource(R.string.recibir_recordatorios_sobre_tus_viajes_y_ahorros),
                                 style = MaterialTheme.typography.bodySmall,
-                                color = if (settings.notificationsEnabled)
-                                    MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.75f)
-                                else
-                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f)
+                                color = masterContentColor.copy(alpha = 0.75f)
                             )
                         }
                         Switch(
@@ -113,9 +108,7 @@ fun SettingsScreen(
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.surface
                         ),
-                        border = androidx.compose.foundation.BorderStroke(
-                            0.5.dp, MaterialTheme.colorScheme.outlineVariant
-                        ),
+                        border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant),
                         elevation = CardDefaults.cardElevation(0.dp)
                     ) {
                         Column {
@@ -155,12 +148,39 @@ fun SettingsScreen(
                 }
             }
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.weight(1f))
+
+            // — Versión de la app —
+            AppVersionFooter()
         }
     }
 }
 
-// — Sección con label —
+@Composable
+private fun AppVersionFooter() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.app_name),
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
+        )
+        Text(
+            text = stringResource(R.string.version_label, BuildConfig.VERSION_NAME),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
 @Composable
 private fun SettingsSection(
     label: String,
@@ -178,7 +198,6 @@ private fun SettingsSection(
     }
 }
 
-// — Item individual dentro de la card —
 @Composable
 private fun SettingsSwitchItem(
     emoji: String,
@@ -212,7 +231,6 @@ private fun SettingsSwitchItem(
     }
 }
 
-// — Divider interno de la card —
 @Composable
 private fun SettingsDivider() {
     HorizontalDivider(

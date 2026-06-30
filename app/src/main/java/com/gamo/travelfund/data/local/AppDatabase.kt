@@ -19,13 +19,19 @@ import com.gamo.travelfund.data.model.entity.TripEntity
         ContributionEntity::class,
         SavingMovementEntity::class
     ],
-    version = 6,
-    exportSchema = false
+    version = AppDatabase.VERSION,
+    exportSchema = true,
 )
+
 
 abstract class AppDatabase : RoomDatabase() {
     abstract fun tripDao(): TripDao
     abstract fun budgetCategoryDao(): BudgetCategoryDao
     abstract fun contributionDao(): ContributionDao
     abstract fun savingMovementDao(): SavingMovementDao
+
+    companion object {
+        const val DATABASE_NAME = "travel_fund_db"
+        const val VERSION = 6
+    }
 }

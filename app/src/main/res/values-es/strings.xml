@@ -103,4 +103,55 @@
     <string name="organiza_tu_presupuesto_por_categor_as">Organiza tu presupuesto por categorías</string>
     <string name="categor_a">Categoría</string>
     <string name="qu_quieres_hacer_con_esta_categor_a">¿Qué quieres hacer con esta categoría?</string>
+    <!-- Recordatorio de 60 días -->
+    <string name="reminder_60_title">Tu viaje está en camino 🌎</string>
+    <string name="reminder_60_message">Faltan 60 días. Puedes comenzar a organizar tu presupuesto.</string>
+
+    <!-- Recordatorio de 30 días -->
+    <string name="reminder_30_title">Empieza la cuenta regresiva 🗓️</string>
+    <string name="reminder_30_message">Faltan 30 días. Es un buen momento para revisar tu presupuesto.</string>
+
+    <!-- Recordatorio de 15 días -->
+    <string name="reminder_15_title">Ya se acerca 👀</string>
+    <string name="reminder_15_message">Faltan 15 días. Revisa si todavía te falta algo por reservar.</string>
+
+    <!-- Recordatorio de 7 días -->
+    <string name="reminder_7_title">Una semana exacta ⏳</string>
+    <string name="reminder_7_message">Faltan 7 días. Es un buen momento para comenzar a preparar tu maleta.</string>
+
+    <!-- Recordatorio de 5 días -->
+    <string name="reminder_5_title">Ya casi 🔥</string>
+    <string name="reminder_5_message">Faltan 5 días. Revisa tus documentos y reservaciones.</string>
+
+    <!-- Recordatorio de 3 días -->
+    <string name="reminder_3_title">¡Se siente cerca! 🎒</string>
+    <string name="reminder_3_message">Faltan 3 días. Es momento de comenzar a empacar.</string>
+
+    <!-- Recordatorio de 2 días -->
+    <string name="reminder_2_title">Últimos preparativos 📋</string>
+    <string name="reminder_2_message">Faltan 2 días. Confirma tu transporte y hospedaje.</string>
+
+    <!-- Recordatorio de 1 día -->
+    <string name="reminder_1_title">¡Es mañana! ✈️</string>
+    <string name="reminder_1_message">Tu viaje es mañana. Prepara todo esta noche.</string>
+
+    <!-- Recordatorio genérico -->
+    <string name="reminder_default_title">Viaje próximo ✈️</string>
+    <string name="reminder_default_message">Tu viaje está cada vez más cerca.</string>
+
+    <string name="meta">Meta</string>
+    <string name="estadisticas">Estadísticas</string>
+    <string name="resumen_de_todos_tus_viajes">Resumen de todos tus viajes</string>
+    <string name="sin_datos_todavia">Sin datos todavía</string>
+    <string name="agrega_tu_primer_viaje">Agrega tu primer viaje para ver estadísticas</string>
+    <string name="progreso_global">Progreso global</string>
+    <string name="de_monto_mxn">de $%1$s MXN</string>
+    <string name="resumen_general">Resumen general</string>
+    <string name="registrados">registrados</string>
+    <string name="en_curso">en curso</string>
+    <string name="completados">completados</string>
+    <string name="viajes">Viajes</string>
+    <string name="ranking_por_progreso">Ranking por progreso</string>
+    <string name="version_label">Versión %1$s</string>
+    <string name="inicio">Inicio</string>
 </resources>
